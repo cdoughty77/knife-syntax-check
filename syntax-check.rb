@@ -41,8 +41,8 @@ module KnifePlugin
       require 'pathname'
     end
 
-    def run 
-      if config[:roles] 
+    def run
+      if config[:roles]
         test_object("roles/*", "role")
       elsif config[:environments]
         test_object("environments/*", "environment")
@@ -60,21 +60,20 @@ module KnifePlugin
         test_cookbooks()
       else
         ui.msg("Usage: knife syntax-check --help")
-      end 
-    end 
+      end
+    end
 
     # Test all cookbooks
     def test_cookbooks()
       ui.msg("Testing all cookbooks...")
-      result = `knife cookbook test --all`
-      ui.msg(result)
+      system("knife cookbook test --all") or raise "Syntax check of all cookbooks failed!"
     end
 
     # Test object syntax
     def test_object(dirname,type)
       ui.msg("Finding type #{type} to test from #{dirname}")
       check_syntax(dirname,nil,type)
-    end 
+    end
 
     # Test databag syntax
     def test_databag(dirname, type)
@@ -83,7 +82,7 @@ module KnifePlugin
       dirs.each do |directory|
         dir = Pathname.new(directory).basename
         check_syntax("#{directory}/*", dir, type)
-      end 
+      end
     end
 
     # Common method to test file syntax
@@ -98,9 +97,9 @@ module KnifePlugin
           hash = parser.parse(json)
         elsif("#{fname}".end_with?('.rb'))
           ui.msg("Testing file #{file}")
-          result = `ruby -c #{file}`
-        end 
-      end 
+          system("ruby -c #{file}") or raise "Syntax check of #{file} failed!"
+        end
+      end
     end
 
   end
